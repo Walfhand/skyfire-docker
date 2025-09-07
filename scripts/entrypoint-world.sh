@@ -1,16 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-: "${DB_HOST:?missing DB_HOST}"
-: "${DB_PORT:=3306}"
-: "${DB_USER:?missing DB_USER}"
-: "${DB_PASS:?missing DB_PASS}"
-: "${LOGIN_DB:=auth}"
-: "${WORLD_DB:=world}"
-: "${CHAR_DB:=characters}"
-: "${DATA_DIR:=/data}"
-: "${SKYFIRE_ETC:=/usr/local/skyfire-server/etc}"
-: "${SKYFIRE_BIN:=/usr/local/skyfire-server/bin}"
+# All variables are now passed from docker-compose environment
 
 # Prepare config files
 if [ ! -f "$SKYFIRE_ETC/worldserver.conf" ] && [ -f "$SKYFIRE_ETC/worldserver.conf.dist" ]; then
@@ -44,11 +35,5 @@ if [ -f "$SKYFIRE_ETC/worldserver.conf" ]; then
   echo "[entrypoint-world] WorldDatabaseInfo set to ${CONN_WORLD}"
   echo "[entrypoint-world] CharacterDatabaseInfo set to ${CONN_CHAR}"
 fi
-
-# NOTE: Skipping wait-for-db here as well to mirror auth behavior during debugging
-echo "[entrypoint-world] Skipping wait-for-db step"
-
-# Data extraction is now manual via 'make extract-force'
-echo "[entrypoint-world] Skipping auto-extraction (use 'make extract-force' if needed)"
 
 exec stdbuf -oL -eL "$SKYFIRE_BIN/worldserver" -f

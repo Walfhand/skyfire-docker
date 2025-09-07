@@ -7,13 +7,7 @@ free -h || echo "free command not available"
 echo "[entrypoint-auth] Container process info:"
 ps aux || echo "ps command not available"
 
-: "${DB_HOST:?missing DB_HOST}"
-: "${DB_PORT:=3306}"
-: "${DB_USER:=admin}"
-: "${DB_PASS:=admin}"
-: "${LOGIN_DB:=auth}"
-: "${SKYFIRE_ETC:=/usr/local/skyfire-server/etc}"
-: "${SKYFIRE_BIN:=/usr/local/skyfire-server/bin}"
+# All variables are now passed from docker-compose environment
 
 echo "[entrypoint-auth] Environment variables:"
 echo "  DB_HOST=${DB_HOST}"

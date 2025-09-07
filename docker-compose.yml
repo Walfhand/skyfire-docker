@@ -3,14 +3,14 @@ services:
     image: mariadb
     restart: "no"
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_PASS}
       MYSQL_ROOT_HOST: "%"
     ports:
       - "3306:3306"
     volumes:
       - dbdata:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mariadb-admin", "ping", "-h", "127.0.0.1", "-p${DB_ROOT_PASSWORD}"]
+      test: ["CMD", "mariadb-admin", "ping", "-h", "127.0.0.1", "-p${DB_PASS}"]
       interval: 10s
       timeout: 5s
       retries: 30
@@ -25,19 +25,24 @@ services:
       db:
         condition: service_healthy
     environment:
-      DB_HOST: ${DB_HOST:-db}
-      DB_PORT: ${DB_PORT:-3306}
-      DB_USER: ${DB_ADMIN_USER:-root}
-      DB_PASS: ${DB_ADMIN_PASS:-root}
-      LOGIN_DB: auth
-      WORLD_DB: world
-      CHAR_DB: characters
-      REALMLIST_ADDRESS: ${REALMLIST_ADDRESS:-127.0.0.1}
+      SKYFIRE_BIN: ${SKYFIRE_BIN}
+      SKYFIRE_CONF: ${SKYFIRE_CONF}
+      SKYFIRE_ETC: ${SKYFIRE_ETC}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      LOGIN_DB: ${LOGIN_DB}
+      WORLD_DB: ${WORLD_DB}
+      CHAR_DB: ${CHAR_DB}
+      REALMLIST_ADDRESS: ${REALMLIST_ADDRESS}
+      DATA_DIR: ${DATA_DIR}
+      WOW_CLIENT_DIR: ${WOW_CLIENT_DIR}
+      SQL_BASE_DIR: ${SQL_BASE_DIR}
+      EXTRA_SQL_DIR: ${EXTRA_SQL_DIR}
     volumes:
       - ./db-extra:/sql-extra:ro
     restart: "no"
-
-  
 
   world:
     build:
@@ -45,14 +50,19 @@ services:
       dockerfile: Dockerfile
       target: world
     environment:
-      DB_HOST: ${DB_HOST:-db}
-      DB_PORT: ${DB_PORT:-3306}
-      DB_USER: ${DB_USER:-admin}
-      DB_PASS: ${DB_PASS:-admin}
-      LOGIN_DB: ${LOGIN_DB:-auth}
-      WORLD_DB: ${WORLD_DB:-world}
-      CHAR_DB: ${CHAR_DB:-characters}
-      DATA_DIR: /data
+      SKYFIRE_BIN: ${SKYFIRE_BIN}
+      SKYFIRE_CONF: ${SKYFIRE_CONF}
+      SKYFIRE_ETC: ${SKYFIRE_ETC}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      LOGIN_DB: ${LOGIN_DB}
+      WORLD_DB: ${WORLD_DB}
+      CHAR_DB: ${CHAR_DB}
+      REALMLIST_ADDRESS: ${REALMLIST_ADDRESS}
+      DATA_DIR: ${DATA_DIR}
+      WOW_CLIENT_DIR: ${WOW_CLIENT_DIR}
     depends_on:
       db:
         condition: service_healthy
@@ -68,7 +78,6 @@ services:
     mem_limit: "2g"
     memswap_limit: "2g"
     ulimits:
-      nproc: 1024
       nofile: 65536
 
   auth:
@@ -77,11 +86,15 @@ services:
       dockerfile: Dockerfile
       target: auth
     environment:
-      DB_HOST: ${DB_HOST:-db}
-      DB_PORT: ${DB_PORT:-3306}
-      DB_USER: ${DB_USER:-admin}
-      DB_PASS: ${DB_PASS:-admin}
-      LOGIN_DB: ${LOGIN_DB:-auth}
+      SKYFIRE_BIN: ${SKYFIRE_BIN}
+      SKYFIRE_CONF: ${SKYFIRE_CONF}
+      SKYFIRE_ETC: ${SKYFIRE_ETC}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      LOGIN_DB: ${LOGIN_DB}
+      REALMLIST_ADDRESS: ${REALMLIST_ADDRESS}
     depends_on:
       db:
         condition: service_healthy
@@ -91,7 +104,6 @@ services:
       - "3724:3724"
     restart: "no"
     ulimits:
-      nproc: 1024
       nofile: 65536
     volumes:
       - ./logs:/var/log/skyfire

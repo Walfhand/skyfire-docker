@@ -1,15 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-: "${DB_HOST:=db}"
-: "${DB_PORT:=3306}"
-: "${DB_USER:=root}"
-: "${DB_PASS:=Abc123Abcd}"
-: "${LOGIN_DB:=auth}"
-: "${WORLD_DB:=world}"
-: "${CHAR_DB:=characters}"
-: "${SQL_BASE_DIR:=/opt/skyfire/sql}"
-: "${EXTRA_SQL_DIR:=/sql-extra}"
+# All variables are now passed from docker-compose environment
 
 # Check if database is already initialized
 check_db_initialized() {

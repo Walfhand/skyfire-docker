@@ -67,13 +67,22 @@ extract-force:
 		cd /wow_client && \
 		mkdir -p dbc db2 cameras maps Buildings && \
 		chmod 777 dbc db2 cameras maps Buildings && \
-		/usr/local/bin/mapextractor && \
+		echo "Extracting DBC, DB2, cameras, and maps..." && \
+		/usr/local/skyfire-server/bin/mapextractor && \
+		echo "Extracting VMAP data..." && \
+		/usr/local/skyfire-server/bin/vmap4extractor && \
+		echo "Moving extracted data to /data..." && \
 		cp -r dbc/* /data/dbc/ 2>/dev/null || true && \
 		cp -r db2/* /data/db2/ 2>/dev/null || true && \
 		cp -r cameras/* /data/cameras/ 2>/dev/null || true && \
 		cp -r maps/* /data/maps/ 2>/dev/null || true && \
 		cp -r Buildings/* /data/Buildings/ 2>/dev/null || true && \
-		rm -rf dbc db2 cameras maps Buildings'
+		echo "Assembling VMAP files in /data..." && \
+		cd /data && \
+		/usr/local/skyfire-server/bin/vmap4assembler Buildings vmaps && \
+		cd /wow_client && \
+		rm -rf dbc db2 cameras maps Buildings && \
+		echo "Extraction completed successfully!"'
 
 ## Tail logs of all services
 logs:

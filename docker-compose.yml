@@ -75,8 +75,6 @@ services:
     ports:
       - "8085:8085"
     restart: "no"
-    mem_limit: "2g"
-    memswap_limit: "2g"
     ulimits:
       nofile: 65536
 

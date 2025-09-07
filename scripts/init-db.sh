@@ -11,6 +11,20 @@ set -euo pipefail
 : "${SQL_BASE_DIR:=/opt/skyfire/sql}"
 : "${EXTRA_SQL_DIR:=/sql-extra}"
 
+# Check if database is already initialized
+check_db_initialized() {
+  local result=$(mysql -h "$DB_HOST" -P "$DB_PORT" -u"$DB_USER" -p"$DB_PASS" -D "$LOGIN_DB" -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='$LOGIN_DB' AND table_name='realmlist';" 2>/dev/null | tail -n1 || echo "0")
+  [ "$result" -gt 0 ]
+}
+
+# Check if database is already initialized
+if check_db_initialized; then
+  echo "[init-db] Database already initialized, skipping import"
+  exit 0
+fi
+
+echo "[init-db] Database not initialized, proceeding with import..."
+
 if [ -x "/opt/skyfire/scripts/wait-for-db.sh" ]; then
   /opt/skyfire/scripts/wait-for-db.sh "$DB_HOST" "$DB_PORT"
 fi

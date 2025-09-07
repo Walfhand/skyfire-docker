@@ -1,5 +1,3 @@
-# version: "3.9" # Obsolete attribute removed
-
 services:
   db:
     image: mariadb
@@ -66,8 +64,8 @@ services:
     ports:
       - "8085:8085"
     restart: "no"
-    mem_limit: "2g"        # limite dure: le conteneur ne dépassera pas 1 Go
-    memswap_limit: "2g"    # pas de swap supplémentaire
+    mem_limit: "2g"
+    memswap_limit: "2g"
     ulimits:
       nproc: 1024
       nofile: 65536
@@ -91,8 +89,6 @@ services:
     ports:
       - "3724:3724"
     restart: "no"
-    mem_limit: "1g"        # limite dure: le conteneur ne dépassera pas 1 Go
-    memswap_limit: "1g"    # pas de swap supplémentaire
     ulimits:
       nproc: 1024
       nofile: 65536

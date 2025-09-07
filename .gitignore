@@ -1,10 +1,10 @@
 # WoW Client files
-wow_client/
 wow_client/*
+!wow_client/.gitkeep
 
 # Data files
-data/
 data/*
+!data/.gitkeep
 
 # SkyFire extracted data
 *.dbc
@@ -35,4 +35,5 @@ Thumbs.db
 
 # Logs
 *.log
-logs/
+logs/*
+!logs/.gitkeep

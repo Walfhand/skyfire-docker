@@ -61,6 +61,7 @@ services:
     volumes:
       - ./data:/data
       - ./wow_client:/wow_client
+      - ./logs:/var/log/skyfire
     ports:
       - "8085:8085"
     restart: "no"
@@ -92,6 +93,8 @@ services:
     ulimits:
       nproc: 1024
       nofile: 65536
+    volumes:
+      - ./logs:/var/log/skyfire
 
 volumes:
   dbdata:

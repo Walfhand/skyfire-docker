@@ -29,6 +29,16 @@ if [ -f "$SKYFIRE_ETC/worldserver.conf" ]; then
   sed -ri "s|^(\s*CharacterDatabaseInfo\s*=).*|\1 \"${CONN_CHAR}\"|" "$SKYFIRE_ETC/worldserver.conf" || true
   sed -ri "s|^(\s*DataDir\s*=).*|\1 \"${DATA_DIR}\"|" "$SKYFIRE_ETC/worldserver.conf" || true
   sed -ri "s|^(\s*Console\.Enable\s*=).*|\1 0|" "$SKYFIRE_ETC/worldserver.conf" || true
+  
+  # Configure file logging to mounted volume (using correct syntax)
+  sed -ri "s|^(\s*Appender\.Server\s*=).*|\1 2,2,0,Server.log,w|" "$SKYFIRE_ETC/worldserver.conf" || true
+  sed -ri "s|^(\s*Logger\.root\s*=).*|\1 3,Console Server|" "$SKYFIRE_ETC/worldserver.conf" || true
+  sed -ri "s|^(\s*LogsDir\s*=).*|\1 \"/var/log/skyfire\"|" "$SKYFIRE_ETC/worldserver.conf" || true
+  echo "[entrypoint-world] Configured file logging to /var/log/skyfire"
+  
+  # Ensure log directory exists and has proper permissions
+  mkdir -p /var/log/skyfire
+  chmod 755 /var/log/skyfire
 
   echo "[entrypoint-world] LoginDatabaseInfo set to ${CONN_LOGIN}"
   echo "[entrypoint-world] WorldDatabaseInfo set to ${CONN_WORLD}"

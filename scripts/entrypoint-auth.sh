@@ -34,10 +34,15 @@ if [ -f "$SKYFIRE_ETC/authserver.conf" ]; then
   sed -ri "s|^(\s*LoginDatabaseInfo\s*=).*|\1 \"${CONN_LOGIN}\"|" "$SKYFIRE_ETC/authserver.conf" || true
   echo "[entrypoint-auth] LoginDatabaseInfo set to \"${CONN_LOGIN}\""
   
-  # Disable file logging to test if it's causing memory leak
-  sed -ri "s|^(\s*Appender\.Auth\s*=).*|\1 0,0,0|" "$SKYFIRE_ETC/authserver.conf" || true
-  sed -ri "s|^(\s*Logger\.root\s*=).*|\1 3,Console|" "$SKYFIRE_ETC/authserver.conf" || true
-  echo "[entrypoint-auth] Disabled file logging to test memory leak"
+  # Configure file logging to mounted volume (using correct syntax from .dist)
+  sed -ri "s|^(\s*Appender\.Auth\s*=).*|\1 2,2,0,Auth.log,w|" "$SKYFIRE_ETC/authserver.conf" || true
+  sed -ri "s|^(\s*Logger\.root\s*=).*|\1 3,Console Auth|" "$SKYFIRE_ETC/authserver.conf" || true
+  sed -ri "s|^(\s*LogsDir\s*=).*|\1 \"/var/log/skyfire\"|" "$SKYFIRE_ETC/authserver.conf" || true
+  echo "[entrypoint-auth] Configured file logging to /var/log/skyfire"
+  
+  # Ensure log directory exists and has proper permissions
+  mkdir -p /var/log/skyfire
+  chmod 755 /var/log/skyfire
 fi
 
 # Wait for database to be ready

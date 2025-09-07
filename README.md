@@ -24,6 +24,7 @@ cp -r /path/to/your/wow/client/* wow_client/
 ```
 
 The `wow_client/` directory structure should look like:
+
 ```
 wow_client/
 ├── Data/
@@ -34,10 +35,12 @@ wow_client/
 ### 2. Prepare Database Files
 
 The project includes a base database in `db-extra/world-base/`:
+
 - `SFDB_full_548_24.001_2024_09_04_Release.zip` - Extract this file to get the SQL database
 - `SFDB_full_548_24.001_2024_09_04_Release.sql` - The extracted SQL file
 
 **To use the included database:**
+
 ```bash
 cd db-extra/world-base/
 unzip SFDB_full_548_24.001_2024_09_04_Release.zip
@@ -53,7 +56,7 @@ Simply replace the SQL file in `db-extra/world-base/` with your own database dum
 **All server configuration is centralized in the `.env` file**. All environment variables for the database, server paths, and connection settings are defined there. The default settings should work for most setups:
 
 - **Database**: MariaDB with auto-initialization
-- **Realm Address**: `127.0.0.1` (localhost)  
+- **Realm Address**: `127.0.0.1` (localhost)
 - **Ports**: Auth server (3724), World server (8085), Database (3306)
 - **All paths and credentials**: Defined in `.env`
 
@@ -76,6 +79,7 @@ make up
 ```
 
 **Or start everything at once:**
+
 ```bash
 make build
 make up-all
@@ -83,22 +87,22 @@ make up-all
 
 ## 📋 Available Commands
 
-| Command | Description |
-|---------|-------------|
-| `make help` | Show all available commands |
-| `make build` | Build all Docker images |
-| `make db` | Start database only |
-| `make init-db` | Initialize database (run after first `make db`) |
-| `make up` | Start world + auth servers (requires db) |
-| `make up-auth` | Start database + auth server only |
-| `make up-all` | Start all services (database + auth + world) |
-| `make ps` | Show service status |
-| `make logs` | View logs from all services |
-| `make logs-world` | View world server logs |
-| `make logs-auth` | View auth server logs |
-| `make stop` | Stop services (keep data) |
-| `make down` | Stop and remove containers (keep data) |
-| `make clean` | Complete cleanup (removes all data) |
+| Command           | Description                                     |
+| ----------------- | ----------------------------------------------- |
+| `make help`       | Show all available commands                     |
+| `make build`      | Build all Docker images                         |
+| `make db`         | Start database only                             |
+| `make init-db`    | Initialize database (run after first `make db`) |
+| `make up`         | Start world + auth servers (requires db)        |
+| `make up-auth`    | Start database + auth server only               |
+| `make up-all`     | Start all services (database + auth + world)    |
+| `make ps`         | Show service status                             |
+| `make logs`       | View logs from all services                     |
+| `make logs-world` | View world server logs                          |
+| `make logs-auth`  | View auth server logs                           |
+| `make stop`       | Stop services (keep data)                       |
+| `make down`       | Stop and remove containers (keep data)          |
+| `make clean`      | Complete cleanup (removes all data)             |
 
 ## 🔧 Data Extraction
 
@@ -109,8 +113,9 @@ make extract-force
 ```
 
 This command extracts:
+
 - **DBC/DB2 files** - Game database files
-- **Maps** - World geometry data  
+- **Maps** - World geometry data
 - **VMaps** - Collision and line-of-sight data
 - **Cameras** - Camera path data
 
@@ -137,16 +142,19 @@ skyfire-docker/
 ### Common Issues
 
 **"No realms available"**
+
 - Check that both auth and world servers are running: `make ps`
 - Verify realmlist.wtf points to `127.0.0.1`
 - Check auth server logs: `make logs-auth`
 
 **"World server down"**
+
 - Ensure data extraction completed successfully
 - Check world server logs: `make logs-world`
 - Verify WoW client files are properly placed in `wow_client/`
 
 **Database connection errors**
+
 - Wait for database to fully initialize (check `make logs`)
 - Ensure `make init-db` was run successfully
 
@@ -167,6 +175,7 @@ docker logs skyfire-docker-db-1
 ### Fresh Start
 
 If you encounter persistent issues:
+
 ```bash
 # Complete cleanup and restart
 make clean
@@ -212,12 +221,8 @@ CHAR_DB=characters
 ### External Access
 
 To allow external connections:
-1. Change `REALMLIST_ADDRESS` in `.env` to your server's IP
-2. Update the `realmlist` table in the database:
-   ```sql
-   UPDATE realmlist SET address = 'YOUR_SERVER_IP' WHERE id = 1;
-   ```
 
+1. Change `REALMLIST_ADDRESS` in `.env` to your server's IP
 
 ## 📝 Notes
 

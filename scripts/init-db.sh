@@ -17,10 +17,6 @@ fi
 
 echo "[init-db] Database not initialized, proceeding with import..."
 
-if [ -x "/opt/skyfire/scripts/wait-for-db.sh" ]; then
-  /opt/skyfire/scripts/wait-for-db.sh "$DB_HOST" "$DB_PORT"
-fi
-
 mysql_exec() {
   mysql -h "$DB_HOST" -P "$DB_PORT" -u"$DB_USER" -p"$DB_PASS" "$@"
 }

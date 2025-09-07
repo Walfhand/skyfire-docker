@@ -39,14 +39,6 @@ if [ -f "$SKYFIRE_ETC/authserver.conf" ]; then
   chmod 755 /var/log/skyfire
 fi
 
-# Wait for database to be ready
-echo "[entrypoint-auth] Waiting for database to be ready..."
-if [ -x "/opt/skyfire/scripts/wait-for-db.sh" ]; then
-  /opt/skyfire/scripts/wait-for-db.sh "$DB_HOST" "$DB_PORT"
-else
-  echo "[entrypoint-auth] wait-for-db.sh not found, proceeding without wait"
-fi
-
 # Quick SQL connectivity test (non-fatal)
 echo "[entrypoint-auth] Running SQL connectivity test to ${DB_HOST}:${DB_PORT} as ${DB_USER} on DB ${LOGIN_DB}"
 if command -v mysql >/dev/null 2>&1; then

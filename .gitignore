@@ -1,0 +1,38 @@
+# WoW Client files
+wow_client/
+wow_client/*
+
+# Data files
+data/
+data/*
+
+# SkyFire extracted data
+*.dbc
+*.map
+*.vmtree
+*.vmtile
+*.mmtile
+
+# Build artifacts
+build/
+*.o
+*.so
+*.a
+
+# Docker volumes
+dbdata/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/

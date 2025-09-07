@@ -1,0 +1,12 @@
+# Docker build context optimizations
+.git
+.gitignore
+node_modules
+**/__pycache__
+**/*.log
+**/.DS_Store
+**/Thumbs.db
+# Local data and client folders (mounted at runtime)
+data
+wow_client
+db-extra

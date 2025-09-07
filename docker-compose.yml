@@ -1,0 +1,101 @@
+# version: "3.9" # Obsolete attribute removed
+
+services:
+  db:
+    image: mariadb
+    restart: "no"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_ROOT_HOST: "%"
+    ports:
+      - "3306:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mariadb-admin", "ping", "-h", "127.0.0.1", "-p${DB_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  # One-shot DB initialization and updates (idempotent)
+  dbtool:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dbtool
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: ${DB_HOST:-db}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_USER: ${DB_ADMIN_USER:-root}
+      DB_PASS: ${DB_ADMIN_PASS:-root}
+      LOGIN_DB: auth
+      WORLD_DB: world
+      CHAR_DB: characters
+      REALMLIST_ADDRESS: ${REALMLIST_ADDRESS:-127.0.0.1}
+    volumes:
+      - ./db-extra:/sql-extra:ro
+    restart: "no"
+
+  
+
+  world:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: world
+    environment:
+      DB_HOST: ${DB_HOST:-db}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_USER: ${DB_USER:-admin}
+      DB_PASS: ${DB_PASS:-admin}
+      LOGIN_DB: ${LOGIN_DB:-auth}
+      WORLD_DB: ${WORLD_DB:-world}
+      CHAR_DB: ${CHAR_DB:-characters}
+      DATA_DIR: /data
+    depends_on:
+      db:
+        condition: service_healthy
+      dbtool:
+        condition: service_completed_successfully
+    volumes:
+      - ./data:/data
+      - ./wow_client:/wow_client
+    ports:
+      - "8085:8085"
+    restart: "no"
+    mem_limit: "2g"        # limite dure: le conteneur ne dépassera pas 1 Go
+    memswap_limit: "2g"    # pas de swap supplémentaire
+    ulimits:
+      nproc: 1024
+      nofile: 65536
+
+  auth:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: auth
+    environment:
+      DB_HOST: ${DB_HOST:-db}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_USER: ${DB_USER:-admin}
+      DB_PASS: ${DB_PASS:-admin}
+      LOGIN_DB: ${LOGIN_DB:-auth}
+    depends_on:
+      db:
+        condition: service_healthy
+      dbtool:
+        condition: service_completed_successfully
+    ports:
+      - "3724:3724"
+    restart: "no"
+    mem_limit: "1g"        # limite dure: le conteneur ne dépassera pas 1 Go
+    memswap_limit: "1g"    # pas de swap supplémentaire
+    ulimits:
+      nproc: 1024
+      nofile: 65536
+
+volumes:
+  dbdata:

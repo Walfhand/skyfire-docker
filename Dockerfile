@@ -15,7 +15,7 @@ FROM ubuntu:24.04 AS builder
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y \
-    g++ make cmake git wget \
+    g++ make cmake git wget ccache \
     gcc-14 g++-14 \
     libssl-dev libreadline-dev bzip2 libbz2-dev \
     mysql-client default-libmysqlclient-dev libmysqlclient-dev libmysql++-dev \
@@ -27,8 +27,8 @@ RUN apt-get update && apt-get install -y \
 # Build directory
 WORKDIR /tmp
 
-# Use local SkyFire sources from the repository (place sources at ./src)
-COPY src /tmp/SkyFire_548
+# NOTE: heavy dependency installs (ACE, OpenSSL, system libs) are kept BEFORE copying sources
+# so that edits to src/ do NOT invalidate these cached layers.
 
 # Install ACE 8.0.1 from source
 RUN wget https://github.com/DOCGroup/ACE_TAO/releases/download/ACE%2BTAO-8_0_1/ACE-8.0.1.tar.gz \
@@ -59,12 +59,39 @@ RUN apt-get update && apt-get install -y \
     libmysqlclient21 \
     && rm -rf /var/lib/apt/lists/*
 
+# Copy local sources late to maximize cache hits
+# We support either of these layouts:
+#  - src/ (contains CMakeLists.txt)
+#  - src/SkyFire_548/ (contains CMakeLists.txt)
+COPY src/ /tmp/src/
+RUN set -e; \
+    mkdir -p /tmp/SkyFire_548; \
+    if [ -f /tmp/src/CMakeLists.txt ]; then \
+      cp -a /tmp/src/. /tmp/SkyFire_548; \
+    elif [ -f /tmp/src/SkyFire_548/CMakeLists.txt ]; then \
+      cp -a /tmp/src/SkyFire_548/. /tmp/SkyFire_548; \
+    else \
+      echo "[builder] ERROR: Could not find CMakeLists.txt in src/ or src/SkyFire_548/."; \
+      echo "[builder] Contents of /tmp/src:"; \
+      ls -la /tmp/src; \
+      exit 1; \
+    fi
+
 WORKDIR /tmp/SkyFire_548
-ENV CC=gcc-14 CXX=g++-14
+# Enable ccache to speed up rebuilds; set compilers explicitly to gcc-14/g++-14
+ENV CCACHE_DIR=/root/.cache/ccache \
+    CC=gcc-14 \
+    CXX=g++-14
 
 RUN mkdir build && cd build
 WORKDIR /tmp/SkyFire_548/build
-RUN cmake ../ -DTOOLS=1 -DCMAKE_INSTALL_PREFIX=/usr/local/skyfire-server \
+# Use BuildKit cache mount for ccache (falls back gracefully if not enabled)
+RUN --mount=type=cache,target=/root/.cache/ccache \
+    cmake ../ -DTOOLS=1 -DCMAKE_INSTALL_PREFIX=/usr/local/skyfire-server \
+      -DCMAKE_C_COMPILER=/usr/bin/gcc-14 \
+      -DCMAKE_CXX_COMPILER=/usr/bin/g++-14 \
+      -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+      -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
     && make -j"$(nproc)" \
     && make install
 

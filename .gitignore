@@ -37,3 +37,7 @@ Thumbs.db
 *.log
 logs/*
 !logs/.gitkeep
+
+# Local SkyFire sources (bring-your-own)
+src/*
+!src/.gitkeep

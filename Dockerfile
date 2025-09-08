@@ -27,8 +27,8 @@ RUN apt-get update && apt-get install -y \
 # Build directory
 WORKDIR /tmp
 
-# Clone SkyFire following official documentation
-RUN git clone -b main https://github.com/ProjectSkyfire/SkyFire_548.git
+# Use local SkyFire sources from the repository (place sources at ./src)
+COPY src /tmp/SkyFire_548
 
 # Install ACE 8.0.1 from source
 RUN wget https://github.com/DOCGroup/ACE_TAO/releases/download/ACE%2BTAO-8_0_1/ACE-8.0.1.tar.gz \

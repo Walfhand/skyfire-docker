@@ -62,7 +62,15 @@ Simply replace the SQL file in `db-extra/world-base/` with your own database dum
 
 You can modify any setting by editing the `.env` file before starting the services.
 
-### 4. Build and Start the Server
+### 4. Use your own SkyFire sources (BYO)
+
+This repository does not include SkyFire sources. Each user should place their own sources in the `src/` folder (ignored by Git in this repo), then build the images. Two common options:
+
+- Clone your fork into `src/`:
+
+Once `src/` exists, build the images. The Dockerfile compiles from these local sources.
+
+### 5. Build and Start the Server
 
 ```bash
 # Build all Docker images
@@ -127,6 +135,7 @@ This command extracts:
 skyfire-docker/
 ├── data/                    # Extracted WoW data (auto-generated)
 ├── wow_client/             # WoW 5.4.8 client files (YOU MUST ADD)
+├── src/                    # Your SkyFire sources (ignored by Git in this repo)
 ├── db-extra/
 │   └── world-base/         # Database files
 ├── logs/                   # Server logs (auto-generated)
